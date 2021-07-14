@@ -1,0 +1,19 @@
+{
+  "name": "mail",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Anh N",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.10",
+    "express": "^4.17.1",
+    "googleapis": "^39.2.0",
+    "js-base64": "^3.6.1",
+    "mailparser": "^3.2.0",
+    "open": "^8.2.1"
+  }
+}
