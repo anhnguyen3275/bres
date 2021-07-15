@@ -1,6 +1,6 @@
 const fs = require('fs');
 const readline = require('readline');
-const {google} = require('googleapis');
+const { google } = require('googleapis');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/gmail.modify'];
@@ -23,9 +23,9 @@ fs.readFile('credentials.json', (err, content) => {
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, callback) {
-  const {client_secret, client_id, redirect_uris} = credentials.web;
+  const { client_secret, client_id, redirect_uris } = credentials.web;
   const oAuth2Client = new google.auth.OAuth2(
-      client_id, client_secret, redirect_uris[0]);
+    client_id, client_secret, redirect_uris[0]);
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) => {
@@ -72,7 +72,7 @@ function getNewToken(oAuth2Client, callback) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 function listLabels(auth) {
-  const gmail = google.gmail({version: 'v1', auth});
+  const gmail = google.gmail({ version: 'v1', auth });
   gmail.users.labels.list({
     userId: 'me',
   }, (err, res) => {
@@ -80,9 +80,9 @@ function listLabels(auth) {
     const labels = res.data.labels;
     if (labels.length) {
       console.log('Labels:');
-      labels.forEach((label) => {        
-        console.log(`- ${label.name} : ${label.id}`);      
-      }); 
+      labels.forEach((label) => {
+        console.log(`- ${label.name} : ${label.id}`);
+      });
       listMessages(auth, "");
     } else {
       console.log('No labels found.');
@@ -90,84 +90,87 @@ function listLabels(auth) {
   });
 
 
-// còn gọi hàm này ra rồi truyền auth vao thôi , em xem nõ chóy main chô nao thi check nhe
+  // còn gọi hàm này ra rồi truyền auth vao thôi , em xem nõ chóy main chô nao thi check nhe
 }
 
-function listMessages(auth, query){
-    query = 'donotreply@appointy.com';
-    return new Promise((resolve, reject) => {    
-      const gmail = google.gmail({version: 'v1', auth});
-      gmail.users.messages.list(      
-        {        
-          userId: 'me',  
-          q:query,      
-          maxResults:5     
-        },            (err, res) => {        
-          if (err) {                    reject(err);          
-            return;        
-          }        
-          if (!res.data.messages) {                    resolve([]);          
-            return;        
-          }                resolve(res.data);  
-  
-                           getMail(res.data.messages[0].id, auth);
-        }    
-      );  
-    })
-  }
-
-  function getMail(msgId, auth){
-    console.log(msgId)
-    const gmail = google.gmail({version: 'v1', auth});
-    //This api call will fetch the mailbody.
-    gmail.users.messages.get({
-        userId:'me',
-        id: msgId ,
-    }, (err, res) => {
-      console.log(res.data.labelIds.INBOX)
-        if(!err){
-          console.log("no error")
-            var body = res.data.payload.parts[0].body.data;
-  
-            // var htmlBody = base64.decode(body.replace(/-/g, '+').replace(/_/g, '/'));
-            console.log(body)
-            // var mailparser = new Mailparser();
-  
-            // mailparser.on("end", (err,res) => {
-            //     console.log("res",res);
-            // })
-  
-            // mailparser.on('data', (dat) => {
-            //     if(dat.type === 'text'){
-            //         const $ = cheerio.load(dat.textAsHtml);
-            //         var links = [];
-            //         var modLinks = [];
-            //         $('a').each(function(i) {
-            //             links[i] = $(this).attr('href');
-            //         });
-  
-            //         //Regular Expression to filter out an array of urls.
-            //         var pat = /------[0-9]-[0-9][0-9]/;
-  
-            //         //A new array modLinks is created which stores the urls.
-            //         modLinks = links.filter(li => {
-            //             if(li.match(pat) !== null){
-            //                 return true;
-            //             }
-            //             else{
-            //                 return false;
-            //             }
-            //         });
-            //         console.log(modLinks);
-  
-            //         //This function is called to open all links in the array.
-  
-            //     }
-            // })
-  
-            // mailparser.write(htmlBody);
-            // mailparser.end();
-  
+function listMessages(auth, query) {
+  query = 'donotreply@appointy.com';
+  return new Promise((resolve, reject) => {
+    const gmail = google.gmail({ version: 'v1', auth });
+    gmail.users.messages.list(
+      {
+        userId: 'me',
+        q: query,
+        maxResults: 5
+      }, (err, res) => {
+        if (err) {
+          reject(err);
+          return;
         }
-    });
-  }
+        if (!res.data.messages) {
+          resolve([]);
+          return;
+        } resolve(res.data);
+
+        getMail(res.data.messages[0].id, auth);
+      }
+    );
+  })
+}
+
+function getMail(msgId, auth) {
+  console.log(msgId)
+  const gmail = google.gmail({ version: 'v1', auth });
+  //This api call will fetch the mailbody.
+  gmail.users.messages.get({
+    userId: 'me',
+    id: msgId,
+  }, (err, res) => {
+    // lam gi co labelIds ma get ra
+    console.log(res.data.labelIds.INBOX)
+    if (!err) {
+      console.log("no error")
+      var body = res.data.payload.parts[0].body.data;
+
+      // var htmlBody = base64.decode(body.replace(/-/g, '+').replace(/_/g, '/'));
+      console.log(res.data.snippet)
+      // var mailparser = new Mailparser();
+
+      // mailparser.on("end", (err,res) => {
+      //     console.log("res",res);
+      // })
+
+      // mailparser.on('data', (dat) => {
+      //     if(dat.type === 'text'){
+      //         const $ = cheerio.load(dat.textAsHtml);
+      //         var links = [];
+      //         var modLinks = [];
+      //         $('a').each(function(i) {
+      //             links[i] = $(this).attr('href');
+      //         });
+
+      //         //Regular Expression to filter out an array of urls.
+      //         var pat = /------[0-9]-[0-9][0-9]/;
+
+      //         //A new array modLinks is created which stores the urls.
+      //         modLinks = links.filter(li => {
+      //             if(li.match(pat) !== null){
+      //                 return true;
+      //             }
+      //             else{
+      //                 return false;
+      //             }
+      //         });
+      //         console.log(modLinks);
+
+      //         //This function is called to open all links in the array.
+
+      //     }
+      // })
+
+      // mailparser.write(htmlBody);
+      // mailparser.end();
+
+    }
+  });
+}
